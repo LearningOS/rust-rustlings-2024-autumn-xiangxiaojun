@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +36,22 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value);
+        self.count += 1;
+        self.bubble_up(self.count);
+    }
+
+    fn bubble_up(&mut self, idx: usize) {
+        let mut current_idx = idx;
+        while current_idx > 1 {
+            let parent_idx = self.parent_idx(current_idx);
+            if (self.comparator)(&self.items[current_idx], &self.items[parent_idx]) {
+                self.items.swap(current_idx, parent_idx);
+                current_idx = parent_idx;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +71,15 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left_idx = self.left_child_idx(idx);
+        let right_idx = self.right_child_idx(idx);
+        
+        if right_idx <= self.count {
+            if (self.comparator)(&self.items[right_idx], &self.items[left_idx]) {
+                return right_idx;
+            }
+        }
+        left_idx
     }
 }
 
@@ -79,13 +100,33 @@ where
 
 impl<T> Iterator for Heap<T>
 where
-    T: Default,
+    T: Default + Clone,
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.is_empty() {
+            return None;
+        }
+        
+        let root = self.items[1].clone(); // 获取根节点的值
+        self.items[1] = self.items[self.count].clone(); // 将最后一个元素移到根节点
+        self.items.pop(); // 移除最后一个元素
+        self.count -= 1;
+    
+        // 向下调整堆
+        let mut current_idx = 1;
+        while self.children_present(current_idx) {
+            let smallest_child = self.smallest_child_idx(current_idx);
+            if (self.comparator)(&self.items[smallest_child], &self.items[current_idx]) {
+                self.items.swap(current_idx, smallest_child);
+                current_idx = smallest_child;
+            } else {
+                break;
+            }
+        }
+    
+        Some(root)
     }
 }
 

@@ -15,6 +15,7 @@
 // "A+" to show that your changes allow alphabetical grades.
 //
 // Execute `rustlings hint quiz3` or use the `hint` watch subcommand for a hint.
+
 use std::fmt::Display;
 
 pub struct ReportCard<T> {
